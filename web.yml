@@ -1,0 +1,38 @@
+- hosts: 192.168.43.71
+  tasks:
+    - name: "installing httpd"
+      package: 
+       name: "httpd" 
+       state: present
+    
+    - name: "creating new directory"
+      file: 
+       state: directory
+       path: "/var/www/lw"
+    
+    - name: "copying lw.conf tp httpd configuration file"
+      copy:    
+       dest: "/etc/httpd/conf.d"
+       src: "/root/lw.conf" 
+      notify: restarting httpd
+
+    - name: "copying content in index.html"
+      copy: 
+       dest: "/var/www/lw/index.html"
+       content: "Hiii!!!!!"
+      notify: RestartHttpd
+    - name: "enabling firewall for 8092 port"
+      firewalld:
+              port: 8099/tcp
+              state: enabled
+              permanent: yes
+              immediate: yes            
+  handlers:
+    - name: "RestartHttpd"
+      service:
+         name: "httpd"
+         state: restarted
+         enabled: yes    
+    
+ 
+
